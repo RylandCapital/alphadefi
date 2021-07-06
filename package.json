@@ -1,0 +1,23 @@
+{
+  "name": "alphadefi",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "server": "nodemon index.js"
+  },
+  "keywords": [],
+  "author": "alphaDefi <rylandmathews1@gmail.com> (alphadefi.finance)",
+  "license": "RylandCapital",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
+    "lowdb": "^2.1.0",
+    "mongoose": "^5.13.2"
+  },
+  "devDependencies": {
+    "concurrently": "^6.2.0",
+    "nodemon": "^2.0.9"
+  }
+}
