@@ -11,10 +11,11 @@ function schemarender(c) {
       collection: c
     });
 
-    const standard = mongoose.model(c, standardSchema);
-
-    return standard
-
+    try{
+    return mongoose.model(c, standardSchema);
+    } catch {
+    return mongoose.model(c)
+    }
    }
 
 
