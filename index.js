@@ -27,6 +27,10 @@ connection.once('open', () => {
 const spreadhiststats = require('./routes/historical');
 app.use('/historical', spreadhiststats);
 
+//info data routes
+const tokendict= require('./routes/info');
+app.use('/info', tokendict);
+
 
 //Run
 const PORT = process.env.PORT || 5000;
