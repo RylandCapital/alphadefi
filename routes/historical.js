@@ -7,8 +7,12 @@ router.route('/spreadhiststats').get((req, res) => {
         .catch(err => res.status(400).json('Error: ' + err));
 });
 
-router.route('/historicallongaprs').get((req, res) => {
-    standard('HistoricalLongAPRs').find()
+router.route('/historicallongaprs(/:ticker)?').get((req, res) => {
+    let fields = {}
+    if (req.params.ticker) {
+        fields[req.params.ticker] = 1
+    }
+    standard('HistoricalLongAPRs').find({}, fields)
         .then(historicallongaprs => res.json(historicallongaprs))
         .catch(err => res.status(400).json('Error: ' + err));
 });
@@ -20,5 +24,3 @@ router.route('/historicalshortaprs').get((req, res) => {
 });
 
 module.exports = router;
-
-
