@@ -16,9 +16,9 @@ router.route('/longaprs(/:ticker)?').get((req, res) => {
 });
 
 router.route('/shortaprs(/:ticker)?').get((req, res) => {
-  
+
     standard('HistoricalShortAPRs').find({ticker: req.params.ticker})
-        .then(historicalShortaprs => res.json(historicalShortaprs))
+        .then(historicalshortaprs => res.json(historicalshortaprs))
         .catch(err => res.status(400).json('Error: ' + err));
 });
 
