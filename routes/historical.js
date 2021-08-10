@@ -22,6 +22,13 @@ router.route('/shortaprs(/:ticker)?').get((req, res) => {
         .catch(err => res.status(400).json('Error: ' + err));
 });
 
+router.route('/comaprs(/:ticker)?').get((req, res) => {
+
+    standard('HistoricalPoolComAPRs').find({pool: req.params.ticker})
+        .then(historicalshortaprs => res.json(historicalshortaprs))
+        .catch(err => res.status(400).json('Error: ' + err));
+});
+
 module.exports = router;
 
 
