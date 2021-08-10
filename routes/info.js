@@ -7,4 +7,20 @@ router.route('/tokendict').get((req, res) => {
         .catch(err => res.status(400).json('Error: ' + err));
 });
 
+router.route('/longvolrankings').get((req, res) => {
+    standard('LongVolRankings').find()
+        .then(longvolrankings => res.json(longvolrankings))
+        .catch(err => res.status(400).json('Error: ' + err));
+});
+
+
+router.route('/shortvolrankings').get((req, res) => {
+    standard('ShortVolRankings').find()
+        .then(shortvolrankings => res.json(shortvolrankings))
+        .catch(err => res.status(400).json('Error: ' + err));
+});
+
+
+
+
 module.exports = router;
