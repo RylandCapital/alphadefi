@@ -31,6 +31,10 @@ app.use('/historical', spreadhiststats);
 const tokendict= require('./routes/info');
 app.use('/info', tokendict);
 
+//health check
+app.get('/health', (req, res) => {
+  res.send('ok')
+})
 
 //Run
 const PORT = process.env.PORT || 5000;
