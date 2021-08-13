@@ -23,6 +23,7 @@ router.route('/spreadhiststats').get((req, res) => {
 
 router.route('/longaprs/:ticker').get((req, res) => {
     standard('HistoricalLongAPRs').find(filterParams(req))
+        .limit(1000)
         .then(historicallongaprs => res.json(historicallongaprs))
         .catch(err => res.status(400).json('Error: ' + err));
 });
