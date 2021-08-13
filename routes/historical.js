@@ -3,8 +3,8 @@ let standard = require('../models/standard');
 let dayjs = require('dayjs');
 
 const filterParams = (req) => {
-    let from = req.params.from || dayjs().subtract(1, 'day')
-    let to = req.params.to || dayjs()
+    let from = req.query.from || dayjs().subtract(1, 'day')
+    let to = req.query.to || dayjs()
     let ticker = req.params.ticker
     return {
         ticker: ticker,
