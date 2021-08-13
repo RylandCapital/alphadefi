@@ -1,6 +1,19 @@
 const router = require('express').Router();
 let standard = require('../models/standard');
+let dayjs = require('dayjs');
 
+const filterParams = (req) => {
+    let from = req.query.from || dayjs().subtract(1, 'day')
+    let to = req.query.to || dayjs()
+    let ticker = req.params.ticker
+    return {
+        ticker: ticker,
+        date: {
+            $gte: dayjs(from).toDate(),
+            $lt: dayjs(to).toDate()
+        }
+    }
+}
 
 router.route('/spreadhiststats').get((req, res) => {
     standard('spreadHISTSTATS').find()
@@ -8,21 +21,21 @@ router.route('/spreadhiststats').get((req, res) => {
         .catch(err => res.status(400).json('Error: ' + err));
 });
 
-router.route('/longaprs(/:ticker)?').get((req, res) => {
-
-    standard('HistoricalLongAPRs').find({ticker: req.params.ticker})
+router.route('/longaprs/:ticker').get((req, res) => {
+    standard('HistoricalLongAPRs').find(filterParams(req))
+        .limit(1000)
         .then(historicallongaprs => res.json(historicallongaprs))
         .catch(err => res.status(400).json('Error: ' + err));
 });
 
-router.route('/shortaprs(/:ticker)?').get((req, res) => {
+router.route('/shortaprs/:ticker').get((req, res) => {
 
     standard('HistoricalShortAPRs').find({ticker: req.params.ticker})
         .then(historicalshortaprs => res.json(historicalshortaprs))
         .catch(err => res.status(400).json('Error: ' + err));
 });
 
-router.route('/comaprs(/:ticker)?').get((req, res) => {
+router.route('/comaprs/:ticker').get((req, res) => {
 
     standard('HistoricalPoolComAPRs').find({pool: req.params.ticker})
         .then(historicalshortaprs => res.json(historicalshortaprs))
@@ -30,5 +43,3 @@ router.route('/comaprs(/:ticker)?').get((req, res) => {
 });
 
 module.exports = router;
-
-
