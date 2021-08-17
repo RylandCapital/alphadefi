@@ -30,14 +30,14 @@ router.route('/longaprs/:ticker').get((req, res) => {
 
 router.route('/shortaprs/:ticker').get((req, res) => {
 
-    standard('HistoricalShortAPRs').find({ticker: req.params.ticker})
+    standard('HistoricalShortAPRs').find(filterParams(req))
         .then(historicalshortaprs => res.json(historicalshortaprs))
         .catch(err => res.status(400).json('Error: ' + err));
 });
 
 router.route('/comaprs/:ticker').get((req, res) => {
 
-    standard('HistoricalPoolComAPRs').find({pool: req.params.ticker})
+    standard('HistoricalPoolComAPRs').find(filterParams(req))
         .then(historicalshortaprs => res.json(historicalshortaprs))
         .catch(err => res.status(400).json('Error: ' + err));
 });
