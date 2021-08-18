@@ -3,7 +3,7 @@ let standard = require('../models/standard');
 let dayjs = require('dayjs');
 
 const filterParams = (req) => {
-    let from = req.query.from || dayjs().subtract(1, 'day')
+    let from = req.query.from || dayjs().subtract(1, 'month')
     let to = req.query.to || dayjs()
     let ticker = req.params.ticker
     return {
@@ -11,6 +11,24 @@ const filterParams = (req) => {
         date: {
             $gte: dayjs(from).toDate(),
             $lt: dayjs(to).toDate()
+        },
+    }
+}
+
+const groupParams = (req) => {
+    if (req.query.precision === 'day') {
+        return {
+            _id: { $dateToString: { format: "%Y-%m-%d", date: '$date' } },
+            date: { $first: { $dateToString: { format: "%Y-%m-%d", date: '$date' } } },
+            ticker: { $first: '$ticker' },
+            apr: { $avg: '$apr' },
+        }
+    } else {
+        return {
+            _id: '$date',
+            date: { $first: '$date' },
+            ticker: { $first: '$ticker' },
+            apr: { $first: '$apr' }
         }
     }
 }
@@ -22,23 +40,38 @@ router.route('/spreadhiststats').get((req, res) => {
 });
 
 router.route('/longaprs/:ticker').get((req, res) => {
-    standard('HistoricalLongAPRs').find(filterParams(req))
-        .limit(1000)
-        .then(historicallongaprs => res.json(historicallongaprs))
+    standard('HistoricalLongAPRs')
+        .aggregate([
+            { $match : filterParams(req) },
+            { $group: groupParams(req) },
+            { $sort: { date : 1 } },
+        ])
+        .limit(2000)
+        .then(aprs => res.json(aprs))
         .catch(err => res.status(400).json('Error: ' + err));
 });
 
 router.route('/shortaprs/:ticker').get((req, res) => {
-
-    standard('HistoricalShortAPRs').find(filterParams(req))
-        .then(historicalshortaprs => res.json(historicalshortaprs))
+    standard('HistoricalShortAPRs')
+        .aggregate([
+            { $match : filterParams(req) },
+            { $group: groupParams(req) },
+            { $sort: { date : 1 } },
+        ])
+        .limit(2000)
+        .then(aprs => res.json(aprs))
         .catch(err => res.status(400).json('Error: ' + err));
 });
 
 router.route('/comaprs/:ticker').get((req, res) => {
-
-    standard('HistoricalPoolComAPRs').find(filterParams(req))
-        .then(historicalshortaprs => res.json(historicalshortaprs))
+    standard('HistoricalPoolComAPRs')
+        .aggregate([
+            { $match : filterParams(req) },
+            { $group: groupParams(req) },
+            { $sort: { date : 1 } },
+        ])
+        .limit(2000)
+        .then(aprs => res.json(aprs))
         .catch(err => res.status(400).json('Error: ' + err));
 });
 
