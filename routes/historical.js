@@ -35,7 +35,7 @@ const groupParams = (req) => {
 
 router.route('/spreadhiststats').get((req, res) => {
     standard('spreadHISTSTATS').find()
-        .then(spreadHISTSTATS => res.json(spreadHISTSTATS[0]))
+        .then(spreadHISTSTATS => res.json(spreadHISTSTATS))
         .catch(err => res.status(400).json('Error: ' + err));
 });
 
