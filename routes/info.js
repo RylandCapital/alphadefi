@@ -7,6 +7,12 @@ router.route('/tokendict').get((req, res) => {
         .catch(err => res.status(400).json('Error: ' + err));
 });
 
+router.route('/pooldict').get((req, res) => {
+    standard('poolDICT').find()
+        .then(poolDICT => res.json(poolDICT))
+        .catch(err => res.status(400).json('Error: ' + err));
+});
+
 router.route('/longvolrankings').get((req, res) => {
     standard('LongVolRankings').find()
         .then(longvolrankings => res.json(longvolrankings))
