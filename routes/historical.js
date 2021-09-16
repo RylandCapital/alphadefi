@@ -39,6 +39,12 @@ router.route('/spreadhiststats').get((req, res) => {
         .catch(err => res.status(400).json('Error: ' + err));
 });
 
+router.route('/poolhiststats').get((req, res) => {
+    standard('poolHISTSTATS').find()
+        .then(spreadHISTSTATS => res.json(spreadHISTSTATS))
+        .catch(err => res.status(400).json('Error: ' + err));
+});
+
 router.route('/longaprs/:ticker').get((req, res) => {
     standard('HistoricalLongAPRs')
         .aggregate([
