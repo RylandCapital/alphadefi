@@ -46,7 +46,7 @@ const groupParamsValue = (req) => {
             _id: '$date',
             date: { $first: '$date' },
             ticker: { $first: '$ticker' },
-            value: { $value: '$value' },
+            value: { $first: '$value' },
         }
     }
 }
