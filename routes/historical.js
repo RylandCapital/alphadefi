@@ -103,7 +103,7 @@ router.route('/anchor/:ticker').get((req, res) => {
     standard('HistoricalAnchor')
         .aggregate([
             { $match : filterParams(req) },
-            { $group: groupParams(req) },
+            { $group: groupParamsValue(req) },
             { $sort: { date : 1 } },
         ])
         .limit(2000)
