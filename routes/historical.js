@@ -33,6 +33,24 @@ const groupParams = (req) => {
     }
 }
 
+const groupParamsValue = (req) => {
+    if (req.query.precision === 'day') {
+        return {
+            _id: { $dateToString: { format: "%Y-%m-%d", date: '$date' } },
+            date: { $first: { $dateToString: { format: "%Y-%m-%d", date: '$date' } } },
+            ticker: { $first: '$ticker' },
+            value: { $value: '$value' },
+        }
+    } else {
+        return {
+            _id: '$date',
+            date: { $first: '$date' },
+            ticker: { $first: '$ticker' },
+            value: { $value: '$value' },
+        }
+    }
+}
+
 router.route('/spreadhiststats').get((req, res) => {
     standard('spreadHISTSTATS').find()
         .then(spreadHISTSTATS => res.json(spreadHISTSTATS))
@@ -71,6 +89,18 @@ router.route('/shortaprs/:ticker').get((req, res) => {
 
 router.route('/comaprs/:ticker').get((req, res) => {
     standard('HistoricalPoolComAPRs')
+        .aggregate([
+            { $match : filterParams(req) },
+            { $group: groupParams(req) },
+            { $sort: { date : 1 } },
+        ])
+        .limit(2000)
+        .then(aprs => res.json(aprs))
+        .catch(err => res.status(400).json('Error: ' + err));
+});
+
+router.route('/anchor/:ticker').get((req, res) => {
+    standard('HistoricalAnchor')
         .aggregate([
             { $match : filterParams(req) },
             { $group: groupParams(req) },
