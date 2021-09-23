@@ -39,7 +39,7 @@ const groupParamsValue = (req) => {
             _id: { $dateToString: { format: "%Y-%m-%d", date: '$date' } },
             date: { $first: { $dateToString: { format: "%Y-%m-%d", date: '$date' } } },
             ticker: { $first: '$ticker' },
-            value: { $value: '$value' },
+            value: { $avg: '$value' },
         }
     } else {
         return {
