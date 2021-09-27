@@ -13,6 +13,12 @@ router.route('/pooldict').get((req, res) => {
         .catch(err => res.status(400).json('Error: ' + err));
 });
 
+router.route('/anchordict').get((req, res) => {
+    standard('anchor_dict').find()
+        .then(anchor_dict => res.json(anchor_dict))
+        .catch(err => res.status(400).json('Error: ' + err));
+});
+
 router.route('/longvolrankings').get((req, res) => {
     standard('LongVolRankings').find()
         .then(longvolrankings => res.json(longvolrankings))
