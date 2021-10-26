@@ -99,6 +99,42 @@ router.route('/comaprs/:ticker').get((req, res) => {
         .catch(err => res.status(400).json('Error: ' + err));
 });
 
+router.route('/ltvs/:ticker').get((req, res) => {
+    standard('ltvs')
+        .aggregate([
+            { $match : filterParams(req) },
+            { $group: groupParamsValue(req) },
+            { $sort: { date : 1 } },
+        ])
+        .limit(2000)
+        .then(aprs => res.json(aprs))
+        .catch(err => res.status(400).json('Error: ' + err));
+});
+
+router.route('/volumes/:ticker').get((req, res) => {
+    standard('volumes')
+        .aggregate([
+            { $match : filterParams(req) },
+            { $group: groupParamsValue(req) },
+            { $sort: { date : 1 } },
+        ])
+        .limit(2000)
+        .then(aprs => res.json(aprs))
+        .catch(err => res.status(400).json('Error: ' + err));
+});
+
+router.route('/prices/:ticker').get((req, res) => {
+    standard('prices')
+        .aggregate([
+            { $match : filterParams(req) },
+            { $group: groupParamsValue(req) },
+            { $sort: { date : 1 } },
+        ])
+        .limit(2000)
+        .then(aprs => res.json(aprs))
+        .catch(err => res.status(400).json('Error: ' + err));
+});
+
 router.route('/anchor/:ticker').get((req, res) => {
     standard('HistoricalAnchor')
         .aggregate([

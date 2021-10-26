@@ -18,7 +18,7 @@
     "express": "^4.17.1",
     "lowdb": "^2.1.0",
     "mongoose": "^5.13.2",
-    "newrelic": "^8.2.0"
+    "newrelic": "^8.5.0"
   },
   "devDependencies": {
     "concurrently": "^6.2.0",
