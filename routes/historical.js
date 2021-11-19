@@ -147,4 +147,15 @@ router.route('/anchor/:ticker').get((req, res) => {
         .catch(err => res.status(400).json('Error: ' + err));
 });
 
+router.route('/nexus/:ticker').get((req, res) => {
+    standard('nexusVaults')
+        .aggregate([
+            { $match : filterParams(req) },
+            { $group: groupParamsValue(req) },
+            { $sort: { date : 1 } },
+        ])
+        .limit(2000)
+        .then(aprs => res.json(aprs))
+        .catch(err => res.status(400).json('Error: ' + err));
+});
 module.exports = router;
