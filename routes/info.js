@@ -13,6 +13,12 @@ router.route('/pooldict').get((req, res) => {
         .catch(err => res.status(400).json('Error: ' + err));
 });
 
+router.route('/nexusdict').get((req, res) => {
+    standard('nexusDict').find()
+        .then(poolDICT => res.json(poolDICT))
+        .catch(err => res.status(400).json('Error: ' + err));
+});
+
 router.route('/anchordict').get((req, res) => {
     standard('anchor_dict').find()
         .then(anchor_dict => res.json(anchor_dict))
