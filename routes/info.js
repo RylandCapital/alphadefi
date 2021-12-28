@@ -19,6 +19,12 @@ router.route('/nexusdict').get((req, res) => {
         .catch(err => res.status(400).json('Error: ' + err));
 });
 
+router.route('/dashboarddict').get((req, res) => {
+    standard('dashboardDict').find()
+        .then(dashboardDict => res.json(dashboardDict))
+        .catch(err => res.status(400).json('Error: ' + err));
+});
+
 router.route('/anchordict').get((req, res) => {
     standard('anchor_dict').find()
         .then(anchor_dict => res.json(anchor_dict))
