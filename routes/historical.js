@@ -99,8 +99,8 @@ router.route('/comaprs/:ticker').get((req, res) => {
         .catch(err => res.status(400).json('Error: ' + err));
 });
 
-router.route('/astrocomaprs/:ticker').get((req, res) => {
-    standard('HistoricalAstroPoolComAPRs')
+router.route('/aprcompare/:ticker').get((req, res) => {
+    standard('HistoricalAPRCompare')
         .aggregate([
             { $match : filterParams(req) },
             { $group: groupParams(req) },
