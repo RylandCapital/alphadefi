@@ -111,6 +111,18 @@ router.route('/aprcompare/:ticker').get((req, res) => {
         .catch(err => res.status(400).json('Error: ' + err));
 });
 
+router.route('/astrocomaprs/:ticker').get((req, res) => {
+    standard('HistoricalAstroPoolComAPRs')
+        .aggregate([
+            { $match : filterParams(req) },
+            { $group: groupParams(req) },
+            { $sort: { date : 1 } },
+        ])
+        .limit(2000)
+        .then(aprs => res.json(aprs))
+        .catch(err => res.status(400).json('Error: ' + err));
+});
+
 router.route('/astroallinaprs/:ticker').get((req, res) => {
     standard('HistoricalAstroPoolAllInAPRs')
         .aggregate([
