@@ -56,6 +56,11 @@ router.route('/aprcompare').get((req, res) => {
         .catch(err => res.status(400).json('Error: ' + err));
 });
 
+router.route('/liqprofile').get((req, res) => {
+    standard('liqprofileSTATS').find()
+        .then(aprCompare => res.json(aprCompare))
+        .catch(err => res.status(400).json('Error: ' + err));
+});
 
 
 

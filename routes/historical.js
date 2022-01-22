@@ -208,3 +208,14 @@ router.route('/terradashboard/:ticker').get((req, res) => {
         .catch(err => res.status(400).json('Error: ' + err));
 });
 module.exports = router;
+
+
+
+
+
+router.route('/kujira/profile').get((req, res) => {
+    standard('liqprofile').find()
+        .then(aprs => res.json(aprs))
+        .catch(err => res.status(400).json('Error: ' + err));
+});
+module.exports = router;
