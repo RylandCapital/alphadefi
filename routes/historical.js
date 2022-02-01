@@ -2,6 +2,8 @@ const router = require('express').Router();
 let standard = require('../models/standard');
 let dayjs = require('dayjs');
 
+
+
 const filterParams = (req) => {
     let from = req.query.from || dayjs().subtract(1, 'month')
     let to = req.query.to || dayjs()
@@ -24,6 +26,7 @@ const groupParams = (req) => {
             apr: { $avg: '$apr' },
         }
     } else {
+        //this returns whatever matches the other parameters unless there is a duplicate DATETIME. all the way to down to ms
         return {
             _id: '$date',
             date: { $first: '$date' },
@@ -50,6 +53,28 @@ const groupParamsValue = (req) => {
         }
     }
 }
+
+const matchDate = (req) => {
+    let datetime = req.query.datetime || dayjs()
+    return {
+        Date: dayjs(datetime).toDate()    
+    }
+}
+
+router.route('/kujira/profiles').get((req, res) => {
+    standard('historicalLiqProfiles')
+        .aggregate([
+            { $match : matchDate(req)},
+            { $sort: { Date : 1 } },
+        ])
+        .limit(2000)
+        .then(aprs => res.json(aprs))
+        .catch(err => res.status(400).json('Error: ' + err));
+});
+
+
+//http://localhost:5000/historical/kujira/profiles/?datetime=2022-02-01T15:30:00.000
+
 
 router.route('/spreadhiststats').get((req, res) => {
     standard('spreadHISTSTATS').find()
@@ -210,12 +235,17 @@ router.route('/terradashboard/:ticker').get((req, res) => {
 module.exports = router;
 
 
-
-
-
 router.route('/kujira/profile').get((req, res) => {
     standard('liqprofile').find()
         .then(aprs => res.json(aprs))
         .catch(err => res.status(400).json('Error: ' + err));
 });
+
+
+
+
+
+
+
+
 module.exports = router;
