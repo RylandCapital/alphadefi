@@ -2,7 +2,11 @@ const router = require('express').Router();
 let standard = require('../models/standard');
 let dayjs = require('dayjs');
 
+var utc = require('dayjs/plugin/utc')
+var timezone = require('dayjs/plugin/timezone') // dependent on utc plugin
 
+dayjs.extend(utc)
+dayjs.extend(timezone)
 
 const filterParams = (req) => {
     let from = req.query.from || dayjs().subtract(1, 'month')
@@ -57,10 +61,11 @@ const groupParamsValue = (req) => {
 const matchDate = (req) => {
     let datetime = req.query.datetime || dayjs()
     return {
-        Date: dayjs(datetime).toDate()    
+        Date: { $gte: dayjs(datetime).toDate(), $lt: dayjs(datetime).add(1, 'hour').toDate() }
     }
 }
 
+//http://localhost:5000/historical/kujira/profiles/?datetime=2022-02-01T15:30:00.000
 router.route('/kujira/profiles').get((req, res) => {
     standard('historicalLiqProfiles')
         .aggregate([
@@ -71,9 +76,6 @@ router.route('/kujira/profiles').get((req, res) => {
         .then(aprs => res.json(aprs))
         .catch(err => res.status(400).json('Error: ' + err));
 });
-
-
-//http://localhost:5000/historical/kujira/profiles/?datetime=2022-02-01T15:30:00.000
 
 
 router.route('/spreadhiststats').get((req, res) => {
