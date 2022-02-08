@@ -21,6 +21,17 @@ const filterParams = (req) => {
     }
 }
 
+const dateRange = (req) => {
+    let from = req.query.from 
+    let to = req.query.to || dayjs()
+    return {
+        day: {
+            $gte: dayjs(from).toDate(),
+            $lt: dayjs(to).toDate()
+        },
+    }
+}
+
 const groupParams = (req) => {
     if (req.query.precision === 'day') {
         return {
@@ -65,7 +76,20 @@ const matchDate = (req) => {
     }
 }
 
-//http://localhost:5000/historical/kujira/profiles/?datetime=2022-02-01T15:30:00.000
+
+
+router.route('/kujira/liquidations').get((req, res) => {
+    standard('kujiraLiquidations')
+        .aggregate([
+            { $match : dateRange(req) },
+            { $sort: { executed_at : 1 } },
+        ])
+        .limit(1000)
+        .then(aprs => res.json(aprs))
+        .catch(err => res.status(400).json('Error: ' + err));
+});
+
+
 router.route('/kujira/profiles').get((req, res) => {
     standard('historicalLiqProfiles')
         .aggregate([
