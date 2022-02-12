@@ -8,6 +8,8 @@ var timezone = require('dayjs/plugin/timezone') // dependent on utc plugin
 dayjs.extend(utc)
 dayjs.extend(timezone)
 
+
+/////// filters/Matches
 const filterParams = (req) => {
     let from = req.query.from || dayjs().subtract(1, 'month')
     let to = req.query.to || dayjs()
@@ -21,7 +23,7 @@ const filterParams = (req) => {
     }
 }
 
-const dateRange = (req) => {
+const dateRangeDay = (req) => {
     let from = req.query.from 
     let to = req.query.to || dayjs()
     return {
@@ -32,7 +34,26 @@ const dateRange = (req) => {
     }
 }
 
-const groupParams = (req) => {
+const dateRangeDate = (req) => {
+    let from = req.query.from 
+    let to = req.query.to || dayjs()
+    return {
+        date: {
+            $gte: dayjs(from).toDate(),
+            $lt: dayjs(to).toDate()
+        },
+    }
+}
+
+const matchDate = (req) => {
+    let datetime = req.query.datetime || dayjs()
+    return {
+        Date: { $gte: dayjs(datetime).toDate(), $lt: dayjs(datetime).add(1, 'hour').toDate() }
+    }
+}
+
+/////// Groups/Aggregate
+const groupParamsMean = (req) => {
     if (req.query.precision === 'day') {
         return {
             _id: { $dateToString: { format: "%Y-%m-%d", date: '$date' } },
@@ -51,7 +72,7 @@ const groupParams = (req) => {
     }
 }
 
-const groupParamsValue = (req) => {
+const groupParamsValueMean = (req) => {
     if (req.query.precision === 'day') {
         return {
             _id: { $dateToString: { format: "%Y-%m-%d", date: '$date' } },
@@ -69,19 +90,35 @@ const groupParamsValue = (req) => {
     }
 }
 
-const matchDate = (req) => {
-    let datetime = req.query.datetime || dayjs()
-    return {
-        Date: { $gte: dayjs(datetime).toDate(), $lt: dayjs(datetime).add(1, 'hour').toDate() }
-    }
-}
+const groupParamsValueUSTMC = (req) => {
+        return {
+            _id: { $dateToString: { format: "%Y-%m-%d", date: '$date' } },
+            date: { $last: { $dateToString: { format: "%Y-%m-%d", date: '$date' } } },
+            value: { $last: '$ust_circulating_supply' },
+        }
+    } 
 
 
+
+
+//////routes
+router.route('/terra/ustmc').get((req, res) => {
+    standard('ustMC')
+        .aggregate([
+            { $match : dateRangeDate(req) },
+            { $group: groupParamsValueUSTMC(req) },
+            { $sort: { Date : 1 } },
+
+        ])
+        .limit(1000)
+        .then(aprs => res.json(aprs))
+        .catch(err => res.status(400).json('Error: ' + err));
+});
 
 router.route('/kujira/liquidations').get((req, res) => {
     standard('kujiraLiquidations')
         .aggregate([
-            { $match : dateRange(req) },
+            { $match : dateRangeDay(req) },
             { $sort: { executed_at : 1 } },
         ])
         .limit(1000)
@@ -118,7 +155,7 @@ router.route('/longaprs/:ticker').get((req, res) => {
     standard('HistoricalLongAPRs')
         .aggregate([
             { $match : filterParams(req) },
-            { $group: groupParams(req) },
+            { $group: groupParamsMean(req) },
             { $sort: { date : 1 } },
         ])
         .limit(2000)
@@ -130,7 +167,7 @@ router.route('/shortaprs/:ticker').get((req, res) => {
     standard('HistoricalShortAPRs')
         .aggregate([
             { $match : filterParams(req) },
-            { $group: groupParams(req) },
+            { $group: groupParamsMean(req) },
             { $sort: { date : 1 } },
         ])
         .limit(2000)
@@ -142,7 +179,7 @@ router.route('/comaprs/:ticker').get((req, res) => {
     standard('HistoricalPoolComAPRs')
         .aggregate([
             { $match : filterParams(req) },
-            { $group: groupParams(req) },
+            { $group: groupParamsMean(req) },
             { $sort: { date : 1 } },
         ])
         .limit(2000)
@@ -154,7 +191,7 @@ router.route('/aprcompare/:ticker').get((req, res) => {
     standard('HistoricalAPRCompare')
         .aggregate([
             { $match : filterParams(req) },
-            { $group: groupParams(req) },
+            { $group: groupParamsMean(req) },
             { $sort: { date : 1 } },
         ])
         .limit(2000)
@@ -166,7 +203,7 @@ router.route('/astrocomaprs/:ticker').get((req, res) => {
     standard('HistoricalAstroPoolComAPRs')
         .aggregate([
             { $match : filterParams(req) },
-            { $group: groupParams(req) },
+            { $group: groupParamsMean(req) },
             { $sort: { date : 1 } },
         ])
         .limit(2000)
@@ -178,7 +215,7 @@ router.route('/astroallinaprs/:ticker').get((req, res) => {
     standard('HistoricalAstroPoolAllInAPRs')
         .aggregate([
             { $match : filterParams(req) },
-            { $group: groupParams(req) },
+            { $group: groupParamsMean(req) },
             { $sort: { date : 1 } },
         ])
         .limit(2000)
@@ -190,7 +227,7 @@ router.route('/ltvs/:ticker').get((req, res) => {
     standard('ltvs')
         .aggregate([
             { $match : filterParams(req) },
-            { $group: groupParamsValue(req) },
+            { $group: groupParamsValueMean(req) },
             { $sort: { date : 1 } },
         ])
         .limit(2000)
@@ -202,7 +239,7 @@ router.route('/volumes/:ticker').get((req, res) => {
     standard('volumes')
         .aggregate([
             { $match : filterParams(req) },
-            { $group: groupParamsValue(req) },
+            { $group: groupParamsValueMean(req) },
             { $sort: { date : 1 } },
         ])
         .limit(2000)
@@ -214,7 +251,7 @@ router.route('/prices/:ticker').get((req, res) => {
     standard('prices')
         .aggregate([
             { $match : filterParams(req) },
-            { $group: groupParamsValue(req) },
+            { $group: groupParamsValueMean(req) },
             { $sort: { date : 1 } },
         ])
         .limit(2000)
@@ -226,7 +263,7 @@ router.route('/anchor/:ticker').get((req, res) => {
     standard('HistoricalAnchor')
         .aggregate([
             { $match : filterParams(req) },
-            { $group: groupParamsValue(req) },
+            { $group: groupParamsValueMean(req) },
             { $sort: { date : 1 } },
         ])
         .limit(2000)
@@ -238,7 +275,7 @@ router.route('/nexus/:ticker').get((req, res) => {
     standard('nexusVaults')
         .aggregate([
             { $match : filterParams(req) },
-            { $group: groupParamsValue(req) },
+            { $group: groupParamsValueMean(req) },
             { $sort: { date : 1 } },
         ])
         .limit(2000)
@@ -251,7 +288,7 @@ router.route('/terradashboard/:ticker').get((req, res) => {
     standard('dashboard')
         .aggregate([
             { $match : filterParams(req) },
-            { $group: groupParamsValue(req) },
+            { $group: groupParamsValueMean(req) },
             { $sort: { date : 1 } },
         ])
         .limit(2000)
