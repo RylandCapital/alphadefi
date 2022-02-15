@@ -136,7 +136,7 @@ router.route('/terra/ustmc').get((req, res) => {
         .catch(err => res.status(400).json('Error: ' + err));
 });
 
-router.route('/historical/coinmarketcaps/:symbol').get((req, res) => {
+router.route('/coinmarketcaps/:symbol').get((req, res) => {
     standard('coinmarketcaps')
         .aggregate([
             { $match : filterParamsSymbol(req) },
