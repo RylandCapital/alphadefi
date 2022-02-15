@@ -23,6 +23,14 @@ const filterParams = (req) => {
     }
 }
 
+const filterParamsSymbol = (req) => {
+
+    let symbol = req.params.symbol
+    return {
+        symbol: symbol,
+    }
+}
+
 const dateRangeDay = (req) => {
     let from = req.query.from 
     let to = req.query.to || dayjs()
@@ -98,6 +106,20 @@ const groupParamsValueUSTMC = (req) => {
         }
     } 
 
+const groupParamsCoinMC = (req) => {
+        return {
+            _id: { $dateToString: { format: "%Y-%m-%d", date: '$last_updated' } },
+            date: { $last: { $dateToString: { date: '$last_updated' } } },
+            circulating_supply: { $last: '$circulating_supply' },
+            total_supply: { $last: '$total_supply' },
+            cmc_rank: { $last: '$cmc_rank' },
+        }
+    } 
+
+
+
+
+
 
 
 
@@ -107,7 +129,19 @@ router.route('/terra/ustmc').get((req, res) => {
         .aggregate([
             { $match : dateRangeDate(req) },
             { $group: groupParamsValueUSTMC(req) },
-            { $sort: { Date : 1 } },
+            { $sort: { date : 1 } },
+
+        ])
+        .then(aprs => res.json(aprs))
+        .catch(err => res.status(400).json('Error: ' + err));
+});
+
+router.route('/historical/coinmarketcaps/:symbol').get((req, res) => {
+    standard('coinmarketcaps')
+        .aggregate([
+            { $match : filterParamsSymbol(req) },
+            { $group: groupParamsCoinMC(req) },
+            { $sort: { date : 1 } },
 
         ])
         .then(aprs => res.json(aprs))
