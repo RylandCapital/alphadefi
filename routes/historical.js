@@ -110,6 +110,7 @@ const groupParamsCoinMC = (req) => {
         return {
             _id: { $dateToString: { format: "%Y-%m-%d", date: '$last_updated' } },
             date: { $last: { $dateToString: { date: '$last_updated' } } },
+            market_cap: { $last: '$quote' },
             circulating_supply: { $last: '$circulating_supply' },
             total_supply: { $last: '$total_supply' },
             cmc_rank: { $last: '$cmc_rank' },
