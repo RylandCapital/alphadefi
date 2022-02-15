@@ -93,7 +93,7 @@ const groupParamsValueMean = (req) => {
 const groupParamsValueUSTMC = (req) => {
         return {
             _id: { $dateToString: { format: "%Y-%m-%d", date: '$date' } },
-            date: { $last: { $dateToString: { format: "%Y-%m-%d", date: '$date' } } },
+            date: { $last: { $dateToString: { date: '$date' } } },
             value: { $last: '$ust_circulating_supply' },
         }
     } 
@@ -110,7 +110,6 @@ router.route('/terra/ustmc').get((req, res) => {
             { $sort: { Date : 1 } },
 
         ])
-        .limit(1000)
         .then(aprs => res.json(aprs))
         .catch(err => res.status(400).json('Error: ' + err));
 });
