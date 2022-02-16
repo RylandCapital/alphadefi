@@ -193,7 +193,6 @@ router.route('/mirror/longaprs/:ticker').get((req, res) => {
             { $group: groupParamsMean(req) },
             { $sort: { date : 1 } },
         ])
-        .limit(2000)
         .then(aprs => res.json(aprs))
         .catch(err => res.status(400).json('Error: ' + err));
 });
@@ -206,7 +205,6 @@ router.route('/mirror/shortaprs/:ticker').get((req, res) => {
             { $group: groupParamsMean(req) },
             { $sort: { date : 1 } },
         ])
-        .limit(2000)
         .then(aprs => res.json(aprs))
         .catch(err => res.status(400).json('Error: ' + err));
 });
@@ -219,7 +217,6 @@ router.route('/mirror/spreads/:ticker').get((req, res) => {
             { $group: groupParamsValueMean(req) },
             { $sort: { date : 1 } },
         ])
-        .limit(2000)
         .then(aprs => res.json(aprs))
         .catch(err => res.status(400).json('Error: ' + err));
 });
