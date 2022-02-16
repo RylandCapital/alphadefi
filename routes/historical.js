@@ -185,7 +185,8 @@ router.route('/poolhiststats').get((req, res) => {
         .catch(err => res.status(400).json('Error: ' + err));
 });
 
-router.route('/longaprs/:ticker').get((req, res) => {
+//this is mirror (terraswap) APRs for mAssets
+router.route('/mirror/longaprs/:ticker').get((req, res) => {
     standard('HistoricalLongAPRs')
         .aggregate([
             { $match : filterParams(req) },
@@ -197,7 +198,8 @@ router.route('/longaprs/:ticker').get((req, res) => {
         .catch(err => res.status(400).json('Error: ' + err));
 });
 
-router.route('/shortaprs/:ticker').get((req, res) => {
+//this is mirror (terraswap) Short APRs for mAssets
+router.route('/mirror/shortaprs/:ticker').get((req, res) => {
     standard('HistoricalShortAPRs')
         .aggregate([
             { $match : filterParams(req) },
@@ -209,6 +211,20 @@ router.route('/shortaprs/:ticker').get((req, res) => {
         .catch(err => res.status(400).json('Error: ' + err));
 });
 
+//this is mirror spreads (mAsset price - oracleprice)
+router.route('/mirror/spreads/:ticker').get((req, res) => {
+    standard('mirrorSpreads')
+        .aggregate([
+            { $match : filterParams(req) },
+            { $group: groupParamsValueMean(req) },
+            { $sort: { date : 1 } },
+        ])
+        .limit(2000)
+        .then(aprs => res.json(aprs))
+        .catch(err => res.status(400).json('Error: ' + err));
+});
+
+//these are terraswap pool APRs from ALPACS api
 router.route('/comaprs/:ticker').get((req, res) => {
     standard('HistoricalPoolComAPRs')
         .aggregate([
