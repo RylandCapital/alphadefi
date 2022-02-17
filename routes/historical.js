@@ -198,20 +198,13 @@ router.route('/kujira/profiles').get((req, res) => {
         .catch(err => res.status(400).json('Error: ' + err));
 });
 
-
 router.route('/spreadhiststats').get((req, res) => {
     standard('spreadHISTSTATS').find()
         .then(spreadHISTSTATS => res.json(spreadHISTSTATS))
         .catch(err => res.status(400).json('Error: ' + err));
 });
 
-router.route('/poolhiststats').get((req, res) => {
-    standard('poolHISTSTATS').find()
-        .then(spreadHISTSTATS => res.json(spreadHISTSTATS))
-        .catch(err => res.status(400).json('Error: ' + err));
-});
-
-//this is mirror (terraswap) APRs for mAssets
+//this is mirror (terraswap) APRs for mAssets with Incentive Rewards
 router.route('/mirror/longaprs/:ticker').get((req, res) => {
     standard('HistoricalLongAPRs')
         .aggregate([
@@ -223,7 +216,7 @@ router.route('/mirror/longaprs/:ticker').get((req, res) => {
         .catch(err => res.status(400).json('Error: ' + err));
 });
 
-//this is mirror (terraswap) Short APRs for mAssets
+//this is mirror (terraswap) Short APRs for mAssets with Incentive Rewards
 router.route('/mirror/shortaprs/:ticker').get((req, res) => {
     standard('HistoricalShortAPRs')
         .aggregate([
@@ -260,54 +253,6 @@ router.route('/pools/:dex/:ticker').get((req, res) => {
 });
 
 
-//these are terraswap pool APRs from ALPACS api
-router.route('/comaprs/:ticker').get((req, res) => {
-    standard('HistoricalPoolComAPRs')
-        .aggregate([
-            { $match : filterParams(req) },
-            { $group: groupParamsMean(req) },
-            { $sort: { date : 1 } },
-        ])
-        .limit(2000)
-        .then(aprs => res.json(aprs))
-        .catch(err => res.status(400).json('Error: ' + err));
-});
-
-//router.route('/aprcompare/:ticker').get((req, res) => {
-//    standard('HistoricalAPRCompare')
-//        .aggregate([
-//            { $match : filterParams(req) },
-//            { $group: groupParamsMean(req) },
-//            { $sort: { date : 1 } },
-//        ])
-//        .limit(2000)
-//        .then(aprs => res.json(aprs))
-//       .catch(err => res.status(400).json('Error: ' + err));
-//});
-
-router.route('/astrocomaprs/:ticker').get((req, res) => {
-    standard('HistoricalAstroPoolComAPRs')
-        .aggregate([
-            { $match : filterParams(req) },
-            { $group: groupParamsMean(req) },
-            { $sort: { date : 1 } },
-        ])
-        .limit(2000)
-        .then(aprs => res.json(aprs))
-        .catch(err => res.status(400).json('Error: ' + err));
-});
-
-router.route('/astroallinaprs/:ticker').get((req, res) => {
-    standard('HistoricalAstroPoolAllInAPRs')
-        .aggregate([
-            { $match : filterParams(req) },
-            { $group: groupParamsMean(req) },
-            { $sort: { date : 1 } },
-        ])
-        .limit(2000)
-        .then(aprs => res.json(aprs))
-        .catch(err => res.status(400).json('Error: ' + err));
-});
 
 router.route('/ltvs/:ticker').get((req, res) => {
     standard('ltvs')
