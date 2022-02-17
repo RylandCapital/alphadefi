@@ -23,6 +23,21 @@ const filterParams = (req) => {
     }
 }
 
+const filterParamsMasterAPR = (req) => {
+    let from = req.query.from || dayjs().subtract(1, 'month')
+    let to = req.query.to || dayjs()
+    let dex = req.params.dex
+    let ticker = req.params.ticker
+    return {
+        masterSymbol: ticker,
+        dex: dex,
+        timestamp: {
+            $gte: dayjs(from).toDate(),
+            $lt: dayjs(to).toDate()
+        },
+    }
+}
+
 const filterParamsSymbol = (req) => {
 
     let symbol = req.params.symbol
@@ -114,6 +129,17 @@ const groupParamsCoinMC = (req) => {
             circulating_supply: { $last: '$circulating_supply' },
             total_supply: { $last: '$total_supply' },
             cmc_rank: { $last: '$cmc_rank' },
+        }
+    } 
+
+    const groupParamsMasterAPR = (req) => {
+        return {
+            _id: { $dateToString: { format: "%Y-%m-%d", date: '$timestamp' } },
+            date: { $last: { $dateToString: { date: '$timestamp' } } },
+            liquidity: { $last: '$ustLiquidity' },
+            ustPoolVolume7d: { $last: '$ustPoolVolume7d' },
+            apr7d: { $last: '$apr7d' },
+            poolPrice: { $last: '$poolPrice' },
         }
     } 
 
@@ -221,6 +247,19 @@ router.route('/mirror/spreads/:ticker').get((req, res) => {
         .catch(err => res.status(400).json('Error: ' + err));
 });
 
+//master pool data all DEXs
+router.route('/pools/:dex/:ticker').get((req, res) => {
+    standard('aprs')
+        .aggregate([
+            { $match : filterParamsMasterAPR(req) },
+            { $group: groupParamsMasterAPR(req) },
+            { $sort: { date : 1 } },
+        ])
+        .then(aprs => res.json(aprs))
+        .catch(err => res.status(400).json('Error: ' + err));
+});
+
+
 //these are terraswap pool APRs from ALPACS api
 router.route('/comaprs/:ticker').get((req, res) => {
     standard('HistoricalPoolComAPRs')
@@ -234,17 +273,17 @@ router.route('/comaprs/:ticker').get((req, res) => {
         .catch(err => res.status(400).json('Error: ' + err));
 });
 
-router.route('/aprcompare/:ticker').get((req, res) => {
-    standard('HistoricalAPRCompare')
-        .aggregate([
-            { $match : filterParams(req) },
-            { $group: groupParamsMean(req) },
-            { $sort: { date : 1 } },
-        ])
-        .limit(2000)
-        .then(aprs => res.json(aprs))
-        .catch(err => res.status(400).json('Error: ' + err));
-});
+//router.route('/aprcompare/:ticker').get((req, res) => {
+//    standard('HistoricalAPRCompare')
+//        .aggregate([
+//            { $match : filterParams(req) },
+//            { $group: groupParamsMean(req) },
+//            { $sort: { date : 1 } },
+//        ])
+//        .limit(2000)
+//        .then(aprs => res.json(aprs))
+//       .catch(err => res.status(400).json('Error: ' + err));
+//});
 
 router.route('/astrocomaprs/:ticker').get((req, res) => {
     standard('HistoricalAstroPoolComAPRs')
