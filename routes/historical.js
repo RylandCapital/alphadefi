@@ -99,15 +99,15 @@ const groupParamsValueMean = (req) => {
     if (req.query.precision === 'day') {
         return {
             _id: { $dateToString: { format: "%Y-%m-%d", date: '$date' } },
-            date: { $last: { $dateToString: { format: "%Y-%m-%d", date: '$date' } } },
-            ticker: { $last: '$ticker' },
-            value: { $avg: '$value' },
+            date: { $first: { $dateToString: { format: "%Y-%m-%d", date: '$date' } } },
+            ticker: { $first: '$ticker' },
+            value: { $last: '$value' },
         }
     } else {
         return {
             _id: '$date',
-            date: { $last: '$date' },
-            ticker: { $last: '$ticker' },
+            date: { $first: '$date' },
+            ticker: { $first: '$ticker' },
             value: { $last: '$value' },
         }
     }
