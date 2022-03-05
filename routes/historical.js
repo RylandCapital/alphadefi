@@ -99,19 +99,20 @@ const groupParamsValueMean = (req) => {
     if (req.query.precision === 'day') {
         return {
             _id: { $dateToString: { format: "%Y-%m-%d", date: '$date' } },
-            date: { $first: { $dateToString: { format: "%Y-%m-%d", date: '$date' } } },
-            ticker: { $first: '$ticker' },
+            date: { $last: { $dateToString: { format: "%Y-%m-%d", date: '$date' } } },
+            ticker: { $last: '$ticker' },
             value: { $avg: '$value' },
         }
     } else {
         return {
             _id: '$date',
-            date: { $first: '$date' },
-            ticker: { $first: '$ticker' },
-            value: { $first: '$value' },
+            date: { $last: '$date' },
+            ticker: { $last: '$ticker' },
+            value: { $last: '$value' },
         }
     }
 }
+
 
 const groupParamsValueUSTMC = (req) => {
         return {
@@ -132,7 +133,7 @@ const groupParamsCoinMC = (req) => {
         }
     } 
 
-    const groupParamsMasterAPR = (req) => {
+const groupParamsMasterAPR = (req) => {
         return {
             _id: { $dateToString: { format: "%Y-%m-%d", date: '$timestamp' } },
             date: { $last: { $dateToString: { date: '$timestamp' } } },
@@ -142,11 +143,6 @@ const groupParamsCoinMC = (req) => {
             poolPrice: { $last: '$poolPrice' },
         }
     } 
-
-
-
-
-
 
 
 
