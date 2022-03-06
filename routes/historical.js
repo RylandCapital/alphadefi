@@ -189,7 +189,7 @@ const groupParamsMasterAPR = (req) => {
     } 
 
 //////routes
-router.route('/liquidstaking/:ticker').get((req, res) => {
+router.route('/liquidstaking').get((req, res) => {
     standard('liquidStaking')
         .aggregate([
             { $match : filterParamsLiquidStaking(req) },
