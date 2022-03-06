@@ -23,6 +23,17 @@ const filterParams = (req) => {
     }
 }
 
+const filterParamsLiquidStaking = (req) => {
+    let from = req.query.from || dayjs().subtract(1, 'month')
+    let to = req.query.to || dayjs()
+    return {
+        collected_date: {
+            $gte: dayjs(from).toDate(),
+            $lt: dayjs(to).toDate()
+        },
+    }
+}
+
 const filterParamsMasterAPR = (req) => {
     let from = req.query.from || dayjs().subtract(1, 'month')
     let to = req.query.to || dayjs()
@@ -95,6 +106,7 @@ const groupParamsMean = (req) => {
     }
 }
 
+//actually returns LAST value not mean
 const groupParamsValueMean = (req) => {
     if (req.query.precision === 'day') {
         return {
@@ -113,6 +125,38 @@ const groupParamsValueMean = (req) => {
     }
 }
 
+const groupParamsLiquidStaking = (req) => {
+    if (req.query.precision === 'day') {
+        return {
+            _id: { $dateToString: { format: "%Y-%m-%d", date: '$collected_date' } },
+            date: { $last: { $dateToString: { format: "%Y-%m-%d", date: '$collected_date' } } },
+            Legacy_Staking_TerraStation_APR: { $last: '$Legacy_Staking_TerraStation_APR' },
+            Legacy_Staking_TerraStation_Value_Date: { $last: '$Legacy_Staking_TerraStation_Value_Date' },
+            Stader_LunaX_Exrate: { $last: '$Stader_LunaX_Exrate' },
+            Stader_LunaX_Exrate_100k_Blocks_Ago: { $last: '$Stader_LunaX_Exrate_100k_Blocks_Ago' },
+            Stader_LunaX_APR: { $last: '$Stader_LunaX_APR'},
+            Nexus_nLuna_APR: { $last: '$Nexus_nLuna_APR' },
+            Prism_yLuna_APR: { $last: '$Prism_yLuna_APR' },
+            Anchor_bLuna_APR: { $last: '$Anchor_bLuna_APR' },
+            Lido_stLuna_APR: { $last: '$Lido_stLuna_APR'},
+        }
+    } else {
+        return {
+            _id: '$collected_date',
+            date: { $last: '$collected_date' },
+            Legacy_Staking_TerraStation_APR: { $last: '$Legacy_Staking_TerraStation_APR' },
+            Legacy_Staking_TerraStation_Value_Date: { $last: '$Legacy_Staking_TerraStation_Value_Date' },
+            Stader_LunaX_Exrate: { $last: '$Stader_LunaX_Exrate' },
+            Stader_LunaX_Exrate_100k_Blocks_Ago: { $last: '$Stader_LunaX_Exrate_100k_Blocks_Ago' },
+            Stader_LunaX_APR: { $last: '$Stader_LunaX_APR'},
+            Nexus_nLuna_APR: { $last: '$Nexus_nLuna_APR' },
+            Prism_yLuna_APR: { $last: '$Prism_yLuna_APR' },
+            Anchor_bLuna_APR: { $last: '$Anchor_bLuna_APR' },
+            Lido_stLuna_APR: { $last: '$Lido_stLuna_APR'},
+            
+        }
+    }
+}
 
 const groupParamsValueUSTMC = (req) => {
         return {
@@ -144,9 +188,18 @@ const groupParamsMasterAPR = (req) => {
         }
     } 
 
-
-
 //////routes
+router.route('/liquidstaking/:ticker').get((req, res) => {
+    standard('liquidStaking')
+        .aggregate([
+            { $match : filterParamsLiquidStaking(req) },
+            { $group: groupParamsLiquidStaking(req) },
+            { $sort: { date : 1 } },
+        ])
+        .then(aprs => res.json(aprs))
+        .catch(err => res.status(400).json('Error: ' + err));
+});
+
 router.route('/terra/ustmc').get((req, res) => {
     standard('ustMC')
         .aggregate([
