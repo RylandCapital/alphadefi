@@ -55,6 +55,12 @@ router.route('/liqprofile').get((req, res) => {
         .catch(err => res.status(400).json('Error: ' + err));
 });
 
+router.route('/liqstakingdict').get((req, res) => {
+    standard('liqStakingDict').find()
+        .then(aprCompare => res.json(aprCompare))
+        .catch(err => res.status(400).json('Error: ' + err));
+});
+
 
 
 
