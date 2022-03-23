@@ -61,6 +61,13 @@ router.route('/liqstakingdict').get((req, res) => {
         .catch(err => res.status(400).json('Error: ' + err));
 });
 
+router.route('/txfailratios').get((req, res) => {
+    standard('txFailRate').find()
+        .then(aprCompare => res.json(aprCompare))
+        .catch(err => res.status(400).json('Error: ' + err));
+});
+
+
 
 
 
