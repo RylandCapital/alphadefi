@@ -186,7 +186,7 @@ router.route('/kujira/liquidations').get((req, res) => {
             { $match : dateRangeDay(req) },
             { $sort: { executed_at : 1 } },
         ])
-        .limit(1000)
+        .limit(5000)
         .then(aprs => res.json(aprs))
         .catch(err => res.status(400).json('Error: ' + err));
 });
