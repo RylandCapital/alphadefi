@@ -47,7 +47,7 @@ const filterParamsSymbol = (req) => {
 }
 
 const dateRangeDay = (req) => {
-    let from = req.query.from || dayjs()
+    let from = req.query.from 
     let to = req.query.to || dayjs()
     return {
         day: {
@@ -58,7 +58,7 @@ const dateRangeDay = (req) => {
 }
 
 const dateRangeDate = (req) => {
-    let from = req.query.from || dayjs()
+    let from = req.query.from 
     let to = req.query.to || dayjs()
     return {
         date: {
@@ -181,8 +181,12 @@ router.route('/coinmarketcaps/:symbol').get((req, res) => {
 });
 
 router.route('/kujira/liquidations').get((req, res) => {
-    standard('kujiraLiquidations').find()
-        .limit(2000)
+    standard('kujiraLiquidations')
+        .aggregate([
+            { $match : dateRangeDay(req) },
+            { $sort: { executed_at : 1 } },
+        ])
+        .limit(5000)
         .then(aprs => res.json(aprs))
         .catch(err => res.status(400).json('Error: ' + err));
 });
