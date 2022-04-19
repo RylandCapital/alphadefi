@@ -184,7 +184,6 @@ router.route('/kujira/liquidations').get((req, res) => {
     standard('kujiraLiquidations')
         .aggregate([
             { $match : dateRangeDay(req) },
-            { $sort: { executed_at : 1 } },
         ])
         .limit(5000)
         .then(aprs => res.json(aprs))
