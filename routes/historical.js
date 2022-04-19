@@ -182,10 +182,7 @@ router.route('/coinmarketcaps/:symbol').get((req, res) => {
 
 router.route('/kujira/liquidations').get((req, res) => {
     standard('kujiraLiquidations')
-        .aggregate([
-            { $match : dateRangeDay(req) },
-        ])
-        .limit(5000)
+        .limit(2000)
         .then(aprs => res.json(aprs))
         .catch(err => res.status(400).json('Error: ' + err));
 });
