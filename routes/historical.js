@@ -47,7 +47,7 @@ const filterParamsSymbol = (req) => {
 }
 
 const dateRangeDay = (req) => {
-    let from = req.query.from 
+    let from = req.query.from || dayjs()
     let to = req.query.to || dayjs()
     return {
         day: {
@@ -58,7 +58,7 @@ const dateRangeDay = (req) => {
 }
 
 const dateRangeDate = (req) => {
-    let from = req.query.from 
+    let from = req.query.from || dayjs()
     let to = req.query.to || dayjs()
     return {
         date: {
