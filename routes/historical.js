@@ -96,7 +96,7 @@ const groupParamsMean = (req) => {
 }
 
 //actually returns LAST value not mean
-const lastdailyValue = (req) => {
+const groupParamsValueMean = (req) => {
     if (req.query.precision === 'day') {
         return {
             _id: { $dateToString: { format: "%Y-%m-%d", date: '$date' } },
@@ -314,7 +314,7 @@ router.route('/nexus/:ticker').get((req, res) => {
     standard('nexusVaults')
         .aggregate([
             { $match : filterParams(req) },
-            { $group: lastdailyValue(req) },
+            { $group: groupParamsValueMean(req) },
             { $sort: { date : 1 } },
         ])
         .limit(2000)
