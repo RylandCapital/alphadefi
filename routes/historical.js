@@ -38,6 +38,21 @@ const filterParamsMasterAPR = (req) => {
     }
 }
 
+const filterParamsMasterAPRRolled = (req) => {
+    let from = req.query.from || dayjs().subtract(1, 'month')
+    let to = req.query.to || dayjs()
+    let dex = req.params.dex
+    let ticker = req.params.ticker
+    return {
+        masterSymbol: ticker,
+        dex: dex,
+        date: {
+            $gte: dayjs(from).toDate(),
+            $lt: dayjs(to).toDate()
+        },
+    }
+}
+
 const filterParamsSymbol = (req) => {
 
     let symbol = req.params.symbol
@@ -75,6 +90,9 @@ const matchDate = (req) => {
     }
 }
 
+
+
+
 /////// Groups/Aggregate
 const groupParamsMean = (req) => {
     if (req.query.precision === 'day') {
@@ -95,7 +113,6 @@ const groupParamsMean = (req) => {
     }
 }
 
-//actually returns LAST value not mean
 const groupParamsValueMean = (req) => {
     if (req.query.precision === 'day') {
         return {
@@ -143,6 +160,8 @@ const groupParamsMasterAPR = (req) => {
             poolPrice: { $last: '$poolPrice' },
         }
     } 
+    
+
 
 //////routes
 router.route('/liquidstaking/:ticker').get((req, res) => {
@@ -258,7 +277,6 @@ router.route('/pools/:dex/:ticker').get((req, res) => {
 });
 
 
-
 router.route('/ltvs/:ticker').get((req, res) => {
     standard('ltvs')
         .aggregate([
@@ -308,8 +326,6 @@ router.route('/anchor/:ticker').get((req, res) => {
 });
 
 
-//indexes: id_1 , ticker
-//updates daily 
 router.route('/nexus/:ticker').get((req, res) => {
     standard('nexusVaults')
         .aggregate([
@@ -345,6 +361,15 @@ router.route('/kujira/profile').get((req, res) => {
 });
 
 
+router.route('/rolled/pools/:dex/:ticker').get((req, res) => {
+    standard('aprsRollD')
+        .aggregate([
+            { $match : filterParamsMasterAPRRolled(req)},
+            { $sort: { date : 1 } },
+        ])
+        .then(aprs => res.json(aprs))
+        .catch(err => res.status(400).json('Error: ' + err));
+});
 
 
 
