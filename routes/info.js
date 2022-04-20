@@ -1,7 +1,7 @@
 const router = require('express').Router();
 let standard = require('../models/standard');
 
-router.route('/dexpooldict').get((req, res) => {
+/*router.route('/dexpooldict').get((req, res) => {
     standard('dexpoolDICT').find()
         .then(tokenDICT => res.json(tokenDICT))
         .catch(err => res.status(400).json('Error: ' + err));
@@ -18,6 +18,7 @@ router.route('/pooldict').get((req, res) => {
         .then(poolDICT => res.json(poolDICT))
         .catch(err => res.status(400).json('Error: ' + err));
 });
+*/
 
 router.route('/nexusdict').get((req, res) => {
     standard('nexusDict').find()
@@ -25,7 +26,7 @@ router.route('/nexusdict').get((req, res) => {
         .catch(err => res.status(400).json('Error: ' + err));
 });
 
-router.route('/dashboarddict').get((req, res) => {
+/*router.route('/dashboarddict').get((req, res) => {
     standard('dashboardDict').find()
         .then(dashboardDict => res.json(dashboardDict))
         .catch(err => res.status(400).json('Error: ' + err));
@@ -66,7 +67,7 @@ router.route('/txfailratios').get((req, res) => {
         .then(aprCompare => res.json(aprCompare))
         .catch(err => res.status(400).json('Error: ' + err));
 });
-
+*/
 
 
 

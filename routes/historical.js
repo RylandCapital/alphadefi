@@ -96,7 +96,7 @@ const groupParamsMean = (req) => {
 }
 
 //actually returns LAST value not mean
-const groupParamsValueMean = (req) => {
+const lastdailyValue = (req) => {
     if (req.query.precision === 'day') {
         return {
             _id: { $dateToString: { format: "%Y-%m-%d", date: '$date' } },
@@ -145,7 +145,7 @@ const groupParamsMasterAPR = (req) => {
     } 
 
 //////routes
-router.route('/liquidstaking/:ticker').get((req, res) => {
+/*router.route('/liquidstaking/:ticker').get((req, res) => {
     standard('liquidStaking')
         .aggregate([
             { $match : filterParams(req) },
@@ -306,12 +306,15 @@ router.route('/anchor/:ticker').get((req, res) => {
         .then(aprs => res.json(aprs))
         .catch(err => res.status(400).json('Error: ' + err));
 });
+*/
 
+//indexes: id_1 , ticker
+//updates daily 
 router.route('/nexus/:ticker').get((req, res) => {
     standard('nexusVaults')
         .aggregate([
             { $match : filterParams(req) },
-            { $group: groupParamsValueMean(req) },
+            { $group: lastdailyValue(req) },
             { $sort: { date : 1 } },
         ])
         .limit(2000)
@@ -320,6 +323,7 @@ router.route('/nexus/:ticker').get((req, res) => {
 });
 module.exports = router;
 
+/*
 router.route('/terradashboard/:ticker').get((req, res) => {
     standard('dashboard')
         .aggregate([
@@ -339,6 +343,7 @@ router.route('/kujira/profile').get((req, res) => {
         .then(aprs => res.json(aprs))
         .catch(err => res.status(400).json('Error: ' + err));
 });
+*/
 
 
 

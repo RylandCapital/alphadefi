@@ -25,12 +25,12 @@ connection.once('open', () => {
 
 
 //historical data routes
-const spreadhiststats = require('./routes/historical');
-app.use('/historical', spreadhiststats);
+const hist = require('./routes/historical');
+app.use('/historical', hist);
 
 //info data routes
-const tokendict= require('./routes/info');
-app.use('/info', tokendict);
+const info= require('./routes/info');
+app.use('/info', info);
 
 //health check
 app.get('/health', (req, res) => {
