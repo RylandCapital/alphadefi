@@ -23,6 +23,19 @@ const filterParams = (req) => {
     }
 }
 
+const filterParamsTimestampTicker = (req) => {
+    let from = req.query.from || dayjs().subtract(1, 'month')
+    let to = req.query.to || dayjs()
+    let ticker = req.params.ticker
+    return {
+        ticker: ticker,
+        timestamp: {
+            $gte: dayjs(from).toDate(),
+            $lt: dayjs(to).toDate()
+        },
+    }
+}
+
 const filterParamsMasterAPR = (req) => {
     let from = req.query.from || dayjs().subtract(1, 'month')
     let to = req.query.to || dayjs()
@@ -164,6 +177,17 @@ const groupParamsMasterAPR = (req) => {
 
 
 //////routes
+router.route('/backtester/:ticker').get((req, res) => {
+    standard('backtester')
+        .aggregate([
+            { $match : filterParamsTimestampTicker(req) },
+            { $sort: { timestamp : 1 } },
+        ])
+        .then(aprs => res.json(aprs))
+        .catch(err => res.status(400).json('Error: ' + err));
+});
+
+
 router.route('/liquidstaking/:ticker').get((req, res) => {
     standard('liquidStaking')
         .aggregate([
@@ -370,11 +394,6 @@ router.route('/rolled/pools/:dex/:ticker').get((req, res) => {
         .then(aprs => res.json(aprs))
         .catch(err => res.status(400).json('Error: ' + err));
 });
-
-
-
-
-
 
 
 module.exports = router;
